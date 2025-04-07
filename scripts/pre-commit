@@ -1,0 +1,65 @@
+#!/bin/sh
+
+# --- 📌 Auto-Install Hook ---
+install_hook() {
+    HOOK_PATH=".git/hooks/pre-commit"
+    if [ ! -f "$HOOK_PATH" ] || ! cmp -s "$0" "$HOOK_PATH"; then
+        echo "🔧 Installing/updating pre-commit hook..."
+        mkdir -p ".git/hooks"
+        cp "$0" "$HOOK_PATH" 2>/dev/null || {
+            echo "❌ Failed to install hook - check permissions"
+            exit 1
+        }
+        chmod +x "$HOOK_PATH"
+        echo "✅ Pre-commit hook installed successfully!"
+    fi
+}
+install_hook
+
+KEY_PATTERNS='(API|SECRET|ACCESS|AUTH|PRIVATE|FIREBASE)[_\-]?(KEY|TOKEN)|(PASS(WORD)?|PWD)[_\-]?=|(TOKEN|KEY|SECRET|PASSWORD)\s*[:=]|(STRIPE|PAYPAL|AWS|MONGO|REDIS|SENDGRID|OPENAI|GITHUB|JWT|SSH|RSA|DOCKER|NPM|YARN|DATABASE|DB|MYSQL|POSTGRES|SQLITE|TWILIO|SLACK|BITBUCKET|GOOGLE|GCP|AZURE|TOKEN)_[A-Z0-9_]+|[A-Z0-9_]+[_\-]?ID\s*[:=]|[A-Z0-9_]+[_\-]?JWT\s*[:=]|[A-Z0-9_]+[_\-]?URL\s*[:=]|CLIENT[_\-]?[A-Z0-9_]+\s*[:=]|[A-Z0-9_]+[_\-]?CLIENT\s*[:=]|OAUTH[_\-]?[A-Z0-9_]+\s*[:=]|[A-Z0-9_]+[_\-]?OAUTH\s*[:=]'
+# KEY_PATTERNS='(API|SECRET|ACCESS|AUTH|PRIVATE|FIREBASE)[_\-]?(KEY|TOKEN)|(PASS(WORD)?|PWD)[_\-]?=|(TOKEN|KEY|SECRET|PASSWORD)\s*[:=]|(STRIPE|PAYPAL|AWS|MONGO|REDIS|SENDGRID|OPENAI|GITHUB|JWT|SSH|RSA|DOCKER|NPM|YARN|DATABASE|DB|MYSQL|POSTGRES|SQLITE|TWILIO|SLACK|BITBUCKET|GOOGLE|GCP|AZURE|TOKEN)_[A-Z0-9_]+'
+
+# --- 🔍 Security Checks ---
+
+# 1. Block .env files (except examples)
+git diff --cached --name-only | grep -E '\.env' | grep -qvE '\.env\.example' && {
+    echo "❌ Commit blocked: .env file detected"
+    echo "   Use .env.example for template configuration instead"
+    exit 1
+}
+
+# 2. Find secret patterns
+detect_secrets() {
+    secret_matches=$(git grep -E --cached -n "$KEY_PATTERNS" 2>/dev/null)
+    
+    if [ -n "$secret_matches" ]; then
+        echo "❌ Key pattern matches found:"
+        echo "$secret_matches" | while IFS=: read -r file line content; do
+            echo "  🔍 $file (line $line):"
+            echo "     $(echo "$content" | cut -c1-80 | sed 's/\(API\|SECRET\|PASSWORD\)/\x1b[31m&\x1b[0m/g')"
+        done
+        return 1
+    fi
+}
+
+# Run checks
+secret_status=0
+# entropy_status=0
+
+echo "=== Running Secret Pattern Check ==="
+detect_secrets || secret_status=1
+
+# echo "\n=== Running Entropy Check ==="
+# check_entropy || entropy_status=1
+
+# Final decision
+if [ $secret_status -ne 0 ] || [ $entropy_status -ne 0 ]; then
+    echo "\n❌ Commit blocked: Potential secrets detected"
+    [ $secret_status -ne 0 ] && echo "  - Found explicit secret patterns"
+    # [ $entropy_status -ne 0 ] && echo "  - Found high-entropy strings"
+    echo "💡 Tip: Remove sensitive data or add to .gitignore"
+    exit 1
+else
+    echo "\n✅ All checks passed - no secrets detected"
+    exit 0
+fi
