@@ -21,21 +21,11 @@ The extension automatically scans your files when you save them, looking for pot
 - Firebase keys
 - And more...
 
-![Secret Detection](images/secret-detection.png)
-
-### 2. Visual Highlighting
-
-When a potential secret is detected, it is highlighted with a warning squiggle in your editor, making it immediately visible.
-
-![Visual Highlighting](images/visual-highlighting.png)
-
-### 3. Warning Notifications
+### 2. Warning Notifications
 
 The extension shows a warning message when secrets are detected, advising you to move them to a .env file.
 
-![Warning Notification](images/warning-notification.png)
-
-### 4. Git Pre-commit Hook
+### 3. Git Pre-commit Hook
 
 The extension includes a pre-commit hook script that provides an additional layer of protection:
 - Blocks commits containing .env files (but allows .env.example files)
@@ -86,7 +76,6 @@ This extension doesn't require any configuration to work out of the box.
 
 - Initial release
 - Real-time secret detection
-- Visual highlighting of potential secrets
 - Warning notifications
 - Git pre-commit hook
 
