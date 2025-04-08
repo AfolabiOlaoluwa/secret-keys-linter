@@ -17,7 +17,6 @@ install_hook() {
 install_hook
 
 KEY_PATTERNS='(API|SECRET|ACCESS|AUTH|PRIVATE|FIREBASE)[_\-]?(KEY|TOKEN)|(PASS(WORD)?|PWD)[_\-]?=|(TOKEN|KEY|SECRET|PASSWORD)\s*[:=]|(STRIPE|PAYPAL|AWS|MONGO|REDIS|SENDGRID|OPENAI|GITHUB|JWT|SSH|RSA|DOCKER|NPM|YARN|DATABASE|DB|MYSQL|POSTGRES|SQLITE|TWILIO|SLACK|BITBUCKET|GOOGLE|GCP|AZURE|TOKEN)_[A-Z0-9_]+|[A-Z0-9_]+[_\-]?ID\s*[:=]|[A-Z0-9_]+[_\-]?JWT\s*[:=]|[A-Z0-9_]+[_\-]?URL\s*[:=]|CLIENT[_\-]?[A-Z0-9_]+\s*[:=]|[A-Z0-9_]+[_\-]?CLIENT\s*[:=]|OAUTH[_\-]?[A-Z0-9_]+\s*[:=]|[A-Z0-9_]+[_\-]?OAUTH\s*[:=]'
-# KEY_PATTERNS='(API|SECRET|ACCESS|AUTH|PRIVATE|FIREBASE)[_\-]?(KEY|TOKEN)|(PASS(WORD)?|PWD)[_\-]?=|(TOKEN|KEY|SECRET|PASSWORD)\s*[:=]|(STRIPE|PAYPAL|AWS|MONGO|REDIS|SENDGRID|OPENAI|GITHUB|JWT|SSH|RSA|DOCKER|NPM|YARN|DATABASE|DB|MYSQL|POSTGRES|SQLITE|TWILIO|SLACK|BITBUCKET|GOOGLE|GCP|AZURE|TOKEN)_[A-Z0-9_]+'
 
 # --- 🔍 Security Checks ---
 
@@ -44,19 +43,14 @@ detect_secrets() {
 
 # Run checks
 secret_status=0
-# entropy_status=0
 
 echo "=== Running Secret Pattern Check ==="
 detect_secrets || secret_status=1
 
-# echo "\n=== Running Entropy Check ==="
-# check_entropy || entropy_status=1
-
 # Final decision
-if [ $secret_status -ne 0 ] || [ $entropy_status -ne 0 ]; then
+if [ $secret_status -ne 0 ]; then
     echo "\n❌ Commit blocked: Potential secrets detected"
     [ $secret_status -ne 0 ] && echo "  - Found explicit secret patterns"
-    # [ $entropy_status -ne 0 ] && echo "  - Found high-entropy strings"
     echo "💡 Tip: Remove sensitive data or add to .gitignore"
     exit 1
 else
