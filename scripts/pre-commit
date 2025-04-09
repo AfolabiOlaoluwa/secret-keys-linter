@@ -29,16 +29,28 @@ git diff --cached --name-only | grep -E '\.env' | grep -qvE '\.env\.example' && 
 
 # 2. Find secret patterns
 detect_secrets() {
-    secret_matches=$(git grep -E --cached -n "$KEY_PATTERNS" 2>/dev/null)
+    potential_matches=$(git grep -E --cached -n "$KEY_PATTERNS" 2>/dev/null)
     
-    if [ -n "$secret_matches" ]; then
-        echo "❌ Key pattern matches found:"
-        echo "$secret_matches" | while IFS=: read -r file line content; do
-            echo "  🔍 $file (line $line):"
-            echo "     $(echo "$content" | cut -c1-80 | sed 's/\(API\|SECRET\|PASSWORD\)/\x1b[31m&\x1b[0m/g')"
-        done
-        return 1
+    if [ -n "$potential_matches" ]; then
+        secret_matches=$(echo "$potential_matches" | 
+            grep -v -E '\$\{.*\}' | 
+            grep -v -E '(import|require|from).*dotenv' | 
+            grep -v -E '(env\.|ENV\[|\$_ENV|\$ENV|getenv|os\.environ)' |
+            grep -v -E 'process\.env' |
+            grep -v -E '`.*\$\{.*\}.*`' |
+            grep -v -E 'config\[')
+        
+        if [ -n "$secret_matches" ]; then
+            echo "❌ Key pattern matches found:"
+            echo "$secret_matches" | while IFS=: read -r file line content; do
+                echo "  🔍 $file (line $line):"
+                echo "     $(echo "$content" | cut -c1-80 | sed 's/\(API\|SECRET\|PASSWORD\)/\x1b[31m&\x1b[0m/g')"
+            done
+            return 1
+        fi
     fi
+    
+    return 0
 }
 
 # Run checks
