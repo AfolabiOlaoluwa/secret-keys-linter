@@ -2,7 +2,12 @@
   "name": "secret-keys-linter",
   "displayName": "Secret Keys Linter",
   "description": "Prevents committing sensitive information like API keys and tokens into version control",
+  "publisher": "SecretKeysLinter",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AfolabiOlaoluwa/secret-keys-linter"
+  },
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -10,6 +15,9 @@
     "Linters"
   ],
   "main": "./out/extension.js",
+  "activationEvents": [
+    "workspaceContains:.git"
+  ],
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
@@ -21,7 +29,7 @@
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "^20.17.30",
-    "@types/vscode": "^1.99.1",
+    "@types/vscode": "^1.75.0",
     "@typescript-eslint/eslint-plugin": "^8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
     "@vscode/test-cli": "^0.0.10",
