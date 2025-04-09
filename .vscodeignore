@@ -9,3 +9,14 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 **/.vscode-test.*
+
+
+.env
+.env.development
+.env.local
+.env.production
+.env.test
+.env.test.local
+.env.example
+
+src/extension.example.ts
