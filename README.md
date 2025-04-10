@@ -48,7 +48,7 @@ The extension works automatically in the background:
 
 ## Requirements
 
-- VS Code 1.98.0 or higher
+- VS Code 1.75.0 or higher
 - Git (for the pre-commit hook functionality)
 
 ## Extension Settings
