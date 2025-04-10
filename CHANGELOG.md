@@ -5,10 +5,10 @@ All notable changes to the "secret-keys-linter" extension will be documented in 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## Maintainers
-- **Owner**: Afolabi Olaoluwa (@AfolabiOlaoluwa)
-- **Contributors**: [List contributors here]
+- **Creator**: Afolabi Olaoluwa (@AfolabiOlaoluwa)
+- **Contributors**: []
 
-## [0.0.1] - 2025-04-09
+## [0.0.1] - 2025-04-10
 
 ### Added
 - Initial release of Secret Keys Linter extension
